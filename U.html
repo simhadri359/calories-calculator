@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Recipe & Nutrition Card — Ponni's Kitchen</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #fffdfb;
+    --card: #ffffff;
+    --muted: #6b5e53;
+    --accent: #ffb47a;
+    --accent-2: #ff8a3d;
+    --glass: rgba(255,255,255,0.7);
+    --radius: 14px;
+    --shadow: 0 12px 30px rgba(102,80,64,0.08);
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg, #fff 0%, var(--bg) 100%);
+    color:var(--muted);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px;
+  }
+
+  .wrap{
+    width:100%;
+    max-width:980px;
+    display:grid;
+    grid-template-columns: 1fr 360px;
+    gap:24px;
+    align-items:start;
+  }
+
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    padding:20px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+
+  /* left card - recipe */
+  .recipe-hero{ display:flex; gap:18px; align-items:flex-start; transition:transform .36s ease, opacity .36s ease; }
+  .imgwrap{
+    width:320px; max-width:40%;
+    border-radius:12px;
+    overflow:hidden;
+    flex-shrink:0;
+    background:linear-gradient(180deg,#fff7ec,#fff0d9);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .imgwrap img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .placeholder{
+    width:100%; padding:34% 12px; display:flex; align-items:center; justify-content:center; color:rgba(107,94,83,0.7);
+    background:linear-gradient(180deg, #fff8f0, #fff1e0);
+    font-size:14px;
+  }
+
+  .meta{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .brand{
+    display:flex; gap:12px; align-items:center;
+  }
+  .hand{ font-family:"Dancing Script", cursive; font-size:34px; color:#7b3f00; line-height:1; }
+  .title{ font-size:20px; font-weight:700; color:var(--accent-2); background: linear-gradient(90deg,#ffda9e,#ffb47a); -webkit-background-clip:text; color:transparent; }
+  .sub{ font-size:14px; color:#8a7567; margin-top:4px; }
+
+  .section{ margin-top:8px; }
+  .section h4{ margin:0 0 8px 0; font-size:15px; color:#6b4a30; }
+  ul{ margin:0; padding-left:18px; }
+  li{ margin-bottom:6px; font-size:14px; color:var(--muted); }
+
+  .controls{ display:flex; gap:10px; margin-top:12px; align-items:center; flex-wrap:wrap; }
+  .btn{
+    background:linear-gradient(180deg,var(--accent),var(--accent-2));
+    color:white; padding:8px 12px; border-radius:10px; border:0; font-weight:600; cursor:pointer;
+    box-shadow: 0 8px 20px rgba(255,138,61,0.12);
+    transition: transform .12s ease;
+  }
+  .btn:hover{ transform: translateY(-2px); }
+
+  .btn.ghost{
+    background:transparent; border:1px solid #f0e6df; color:var(--muted);
+    box-shadow:none;
+  }
+
+  /* right card - status/nutrition */
+  .side{
+    display:flex; flex-direction:column; gap:12px;
+  }
+  .nutrition{
+    padding:14px; border-radius:10px; background:linear-gradient(180deg, rgba(255,250,246,0.7), rgba(255,245,236,0.6));
+  }
+  .nut-row{ display:flex; justify-content:space-between; margin-bottom:8px; font-size:14px; color:#7f6b60; }
+  .toggle{
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+  }
+
+  .fade {
+    transition: opacity .36s ease, transform .36s ease;
+    opacity:1; transform:none;
+  }
+  .fade.hide {
+    opacity:0; transform: translateY(10px) scale(.995);
+    pointer-events:none;
+  }
+
+  /* small responsive */
+  @media (max-width:920px){
+    .wrap{ grid-template-columns:1fr; }
+    .imgwrap{ width:48%; }
+  }
+
+  @media (max-width:540px){
+    .imgwrap{ width:100%; max-width:100%; }
+    .recipe-hero{ flex-direction:column; }
+  }
+
+  /* subtle animations for switching */
+  .anim-enter { opacity:0; transform: translateY(8px) scale(.995); }
+  .anim-enter.anim-ready { opacity:1; transform: none; transition: all .34s cubic-bezier(.2,.9,.2,1); }
+
+  /* Nutrition toggle */
+  .switch { position:relative; width:46px; height:26px; background:#f0ebe6; border-radius:999px; display:inline-block; cursor:pointer; }
+  .switch i { position:absolute; left:4px; top:4px; width:18px; height:18px; border-radius:50%; background:white; transition:left .18s ease; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+  .switch.on { background: linear-gradient(90deg,var(--accent),var(--accent-2)); }
+  .switch.on i { left:24px; }
+
+  /* step list */
+  ol.steps{ padding-left:18px; margin:0; color:var(--muted); font-size:14px; }
+  ol.steps li{ margin-bottom:10px; line-height:1.45; }
+
+  .small-note{ font-size:13px; color:#9a8680; margin-top:10px; }
+</style>
+</head>
+<body>
+  <div class="wrap" id="app">
+    <!-- Left: Recipe card -->
+    <div class="card" id="recipeCard" aria-live="polite">
+      <div id="contentWrap" class="recipe-hero fade">
+        <div class="imgwrap" id="imageWrapper">
+          <!-- image or placeholder -->
+          <img id="recipeImage" alt="Recipe image" />
+        </div>
+
+        <div class="meta">
+          <div class="brand">
+            <div class="hand">Ponni</div>
+            <div>
+              <div class="title" id="recipeName">Pasta al Pomodoro</div>
+              <div class="sub" id="recipeDesc">A simple, timeless pasta with fresh tomato, basil and olive oil.</div>
+            </div>
+          </div>
+
+          <div class="section">
+            <h4>Ingredients</h4>
+            <ul id="ingredientsList"></ul>
+          </div>
+
+          <div class="section">
+            <h4>Preparation</h4>
+            <ol class="steps" id="stepsList"></ol>
+          </div>
+
+          <div class="controls">
+            <button class="btn" id="nextBtn">Next Recipe</button>
+            <button class="btn ghost" id="randomBtn">Random Recipe</button>
+            <button class="btn ghost" id="toggleNutritionBtn">Show/Hide Nutrition</button>
+            <div style="margin-left:auto" class="small-note">Tip: Use Next / Random to explore recipes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Nutrition / Info -->
+    <div class="card side">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="font-weight:700; color:#6b4a30">Nutrition Facts</div>
+          <div class="toggle">
+            <div style="font-size:13px; color:#8a7567; margin-right:8px">Toggle</div>
+            <div id="nutritionSwitch" class="switch on" role="button" aria-pressed="true"><i></i></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="nutritionCard" class="nutrition fade">
+        <div class="nut-row"><span>Calories</span><strong id="nutCalories">--</strong></div>
+        <div class="nut-row"><span>Protein</span><strong id="nutProtein">-- g</strong></div>
+        <div class="nut-row"><span>Carbohydrates</span><strong id="nutCarbs">-- g</strong></div>
+        <div class="nut-row"><span>Fats</span><strong id="nutFats">-- g</strong></div>
+        <div class="nut-row"><span>Fiber</span><strong id="nutFiber">-- g</strong></div>
+      </div>
+
+      <hr class="sep" style="border:none;border-top:1px solid #f0ebe6">
+
+      <div>
+        <h4 style="margin:0 0 6px 0;color:#6b4a30">About this app</h4>
+        <p style="margin:0;font-size:13px;color:#7f6b60">
+          All recipes are stored locally in JavaScript. Click <em>Next</em> or <em>Random</em> to view different recipes.
+        </p>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* Recipe & Nutrition Card
+   - Single-file app
+   - Array of recipe objects below
+   - Smooth transitions and accessible controls
+*/
+
+// Sample recipes (you can edit or add more)
+const RECIPES = [
+  {
+    name: "Pasta al Pomodoro",
+    image: "", // leave empty to use generated placeholder
+    desc: "A simple, timeless pasta with fresh tomato, basil and olive oil.",
+    ingredients: [
+      "200g spaghetti or linguine",
+      "4 ripe tomatoes (or 1 can crushed tomatoes)",
+      "2 cloves garlic (sliced)",
+      "4 tbsp extra-virgin olive oil",
+      "Handful fresh basil leaves",
+      "Salt & black pepper to taste",
+      "Parmesan cheese (optional)"
+    ],
+    steps: [
+      "Boil salted water and cook pasta until al dente according to package.",
+      "Heat oil in a pan, add sliced garlic and lightly fry until golden (do not burn).",
+      "Add chopped tomatoes (or crushed) and simmer 8–10 minutes, season with salt & pepper.",
+      "Toss pasta into the sauce with a splash of pasta water until combined.",
+      "Finish with fresh basil and grated Parmesan if you like. Serve immediately."
+    ],
+    nutrition: {
+      calories: 520,
+      protein: 14,
+      carbs: 78,
+      fats: 16,
+      fiber: 6
+    }
+  },
+  {
+    name: "Fluffy Pancakes",
+    image: "",
+    desc: "Soft, fluffy pancakes perfect for breakfast or brunch.",
+    ingredients: [
+      "1 1/4 cups all-purpose flour",
+      "2 tbsp sugar",
+      "1 tbsp baking powder",
+      "1/2 tsp salt",
+      "1 cup milk",
+      "1 egg",
+      "2 tbsp melted butter",
+      "Maple syrup and berries to serve"
+    ],
+    steps: [
+      "Whisk dry ingredients (flour, sugar, baking powder, salt) in a bowl.",
+      "In another bowl beat egg with milk and melted butter.",
+      "Combine wet and dry ingredients gently (do not overmix).",
+      "Heat a skillet, pour batter and cook until bubbles form; flip and cook until golden.",
+      "Serve stacked with butter, syrup and berries."
+    ],
+    nutrition: {
+      calories: 420,
+      protein: 8,
+      carbs: 52,
+      fats: 18,
+      fiber: 2
+    }
+  },
+  {
+    name: "Fresh Garden Salad",
+    image: "",
+    desc: "Crisp greens with a bright lemon-olive dressing.",
+    ingredients: [
+      "2 cups mixed salad greens",
+      "1/2 cucumber, sliced",
+      "1/2 red onion, thinly sliced",
+      "10 cherry tomatoes, halved",
+      "2 tbsp olive oil",
+      "1 tbsp lemon juice",
+      "Salt & pepper"
+    ],
+    steps: [
+      "Combine greens, cucumber, tomatoes and onion in a bowl.",
+      "Whisk olive oil, lemon juice, salt and pepper to make dressing.",
+      "Toss salad with dressing just before serving."
+    ],
+    nutrition: {
+      calories: 150,
+      protein: 3,
+      carbs: 8,
+      fats: 12,
+      fiber: 3
+    }
+  }
+];
+
+// App state
+let currentIndex = 0;
+
+// DOM refs
+const recipeName = document.getElementById('recipeName');
+const recipeDesc = document.getElementById('recipeDesc');
+const ingredientsList = document.getElementById('ingredientsList');
+const stepsList = document.getElementById('stepsList');
+const recipeImage = document.getElementById('recipeImage');
+const imageWrapper = document.getElementById('imageWrapper');
+
+const nutCalories = document.getElementById('nutCalories');
+const nutProtein = document.getElementById('nutProtein');
+const nutCarbs = document.getElementById('nutCarbs');
+const nutFats = document.getElementById('nutFats');
+const nutFiber = document.getElementById('nutFiber');
+
+const nextBtn = document.getElementById('nextBtn');
+const randomBtn = document.getElementById('randomBtn');
+const toggleNutritionBtn = document.getElementById('toggleNutritionBtn');
+const nutritionSwitch = document.getElementById('nutritionSwitch');
+const nutritionCard = document.getElementById('nutritionCard');
+const contentWrap = document.getElementById('contentWrap');
+
+// Utility: create placeholder SVG dataURL
+function placeholderSVG(title){
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 520'>
+    <defs>
+      <linearGradient id="g" x1="0" x2="1">
+        <stop offset="0" stop-color="#fff7ec"/><stop offset="1" stop-color="#fff1e0"/>
+      </linearGradient>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#g)"/>
+    <g font-family="Inter, Arial" text-anchor="middle" fill="#7b3f00">
+      <text x="50%" y="44%" font-size="36" font-weight="700">${escapeHtml(title)}</text>
+      <text x="50%" y="60%" font-size="18" fill="#a87a4a">Image not provided</text>
+    </g>
+  </svg>`;
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+}
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, (m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+
+// Render a recipe into the card (with transitions)
+function renderRecipe(index, animate = true){
+  const r = RECIPES[index];
+  // animation: fade out -> update -> fade in
+  if (animate){
+    contentWrap.classList.add('hide');
+    setTimeout(()=> {
+      applyRecipeToDOM(r);
+      contentWrap.classList.remove('hide');
+      contentWrap.classList.add('anim-enter');
+      requestAnimationFrame(()=> contentWrap.classList.add('anim-ready'));
+      setTimeout(()=> {
+        contentWrap.classList.remove('anim-enter', 'anim-ready');
+      }, 380);
+    }, 220);
+  } else {
+    applyRecipeToDOM(r);
+  }
+}
+
+function applyRecipeToDOM(r){
+  recipeName.textContent = r.name;
+  recipeDesc.textContent = r.desc || '';
+
+  // ingredients
+  ingredientsList.innerHTML = '';
+  for (const ing of r.ingredients){
+    const li = document.createElement('li');
+    li.textContent = ing;
+    ingredientsList.appendChild(li);
+  }
+
+  // steps
+  stepsList.innerHTML = '';
+  for (const step of r.steps){
+    const li = document.createElement('li');
+    li.textContent = step;
+    stepsList.appendChild(li);
+  }
+
+  // image handling: if image provided, use it; else placeholder.
+  if (r.image && r.image.trim() !== ''){
+    recipeImage.src = r.image;
+    recipeImage.alt = `${r.name} image`;
+    recipeImage.style.display = 'block';
+    // on error, replace with placeholder
+    recipeImage.onerror = function(){
+      this.style.display = 'none';
+      showPlaceholder(r.name);
+    };
+  } else {
+    // remove any img src & show placeholder via data-URL
+    recipeImage.removeAttribute('src');
+    recipeImage.style.display = 'none';
+    showPlaceholder(r.name);
+  }
+
+  // nutrition
+  const n = r.nutrition || {};
+  nutCalories.textContent = (n.calories !== undefined) ? `${n.calories} kcal` : '--';
+  nutProtein.textContent = (n.protein !== undefined) ? `${n.protein} g` : '--';
+  nutCarbs.textContent = (n.carbs !== undefined) ? `${n.carbs} g` : (n.carbohydrates !== undefined ? `${n.carbohydrates} g` : '--');
+  nutFats.textContent = (n.fats !== undefined) ? `${n.fats} g` : '--';
+  nutFiber.textContent = (n.fiber !== undefined) ? `${n.fiber} g` : '--';
+}
+
+// show placeholder element inside imageWrapper
+function showPlaceholder(title){
+  imageWrapper.querySelectorAll('.placeholder').forEach(n=>n.remove());
+  const div = document.createElement('div');
+  div.className = 'placeholder';
+  // embed as background SVG
+  const data = placeholderSVG(title);
+  const img = document.createElement('img');
+  img.src = data;
+  img.alt = title + ' placeholder';
+  img.style.width = '100%';
+  img.style.height = '100%';
+  img.style.objectFit = 'cover';
+  div.appendChild(img);
+  imageWrapper.appendChild(div);
+}
+
+// navigation handlers
+nextBtn.addEventListener('click', ()=>{
+  currentIndex = (currentIndex + 1) % RECIPES.length;
+  renderRecipe(currentIndex, true);
+});
+
+randomBtn.addEventListener('click', ()=>{
+  let idx = Math.floor(Math.random() * RECIPES.length);
+  if (RECIPES.length > 1){
+    // ensure different from current
+    let attempts = 0;
+    while (idx === currentIndex && attempts < 6){ idx = Math.floor(Math.random() * RECIPES.length); attempts++; }
+  }
+  currentIndex = idx;
+  renderRecipe(currentIndex, true);
+});
+
+// toggle nutrition panel
+nutritionSwitch.addEventListener('click', ()=>{
+  const on = nutritionSwitch.classList.toggle('on');
+  nutritionSwitch.setAttribute('aria-pressed', on ? 'true' : 'false');
+  if (on){
+    nutritionCard.classList.remove('hide');
+    // ensure visible
+    setTimeout(()=> nutritionCard.classList.remove('fade','hide'), 20);
+  } else {
+    nutritionCard.classList.add('hide');
+  }
+});
+
+// initial render
+document.addEventListener('DOMContentLoaded', ()=>{
+  // ensure an <img> exists for recipeImage - if not, create it
+  if (!recipeImage){
+    const img = document.createElement('img');
+    img.id = 'recipeImage';
+    imageWrapper.appendChild(img);
+  }
+  renderRecipe(currentIndex, false);
+});
+
+// Accessibility: keyboard navigation
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight') nextBtn.click();
+  if (e.key === 'r') randomBtn.click();
+});
+
+// Expose add/edit functions in console for quick testing (optional)
+window._RECIPES = RECIPES;
+window._render = (i)=>{ currentIndex = i % RECIPES.length; renderRecipe(currentIndex, true); };
+
+</script>
+</body>
+</html>
